@@ -1,0 +1,596 @@
+/* ============================================================
+   SmartBill design system — calm, trustworthy, thumb-friendly.
+   Principles: system type, hairlines over boxes, one accent
+   (shop-green), tabular numerals for money, no gradients,
+   no decoration that doesn't help a busy shopkeeper.
+   Contract classes/ids used by js/app.js are all preserved.
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+:root {
+  --paper: #F7F6F2;        /* warm app background */
+  --surface: #FFFFFF;       /* cards, sheets */
+  --ink: #1D1C19;           /* primary text */
+  --muted: #6F6A5E;         /* secondary text */
+  --hairline: #E8E3D8;      /* 1px separators */
+  --accent: #0C7A3D;        /* shop-green: primary actions, totals */
+  --accent-ink: #FFFFFF;
+  --accent-tint: #E4F3E8;   /* selected / success wash */
+  --danger: #C02B2B;
+  --danger-tint: #FBE9E7;
+  --warn: #96660A;
+  --warn-tint: #FAF0DA;
+  --radius: 18px;
+  --radius-sm: 14px;
+  --shadow: 0 1px 2px rgba(29, 28, 25, 0.05), 0 8px 24px rgba(29, 28, 25, 0.06);
+  --tabbar-h: 68px;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+    "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.5;
+  font-size: 16px;
+  padding-bottom: calc(var(--tabbar-h) + 24px); /* room for bottom tab bar */
+}
+
+@media (min-width: 900px) {
+  body { padding-bottom: 0; }
+}
+
+/* ---------- App shell: bottom tab bar on phones, sidebar on laptop ---------- */
+#shell { display: block; }
+#side {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 20;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--hairline);
+  box-shadow: 0 -8px 24px rgba(29, 28, 25, 0.08);
+}
+#side .brand-block, #side .side-foot { display: none; }
+#main-nav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+}
+#main-nav button {
+  flex: 1 0 auto;
+  min-height: 52px;
+  min-width: 56px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease-out, color 0.15s ease-out, transform 0.1s ease-out;
+}
+#main-nav button:active { transform: scale(0.96); }
+#main-nav button.active { background: var(--accent-tint); color: var(--accent); }
+
+@media (min-width: 900px) {
+  #side {
+    top: 0; bottom: 0; right: auto;
+    width: 268px;
+    display: flex;
+    flex-direction: column;
+    padding: calc(30px + env(safe-area-inset-top)) 16px 20px;
+    background: #FFFDF8;
+    border-top: 0;
+    border-right: 1px solid var(--hairline);
+    box-shadow: none;
+  }
+  #side .brand-block { display: block; padding: 0 10px; }
+  #side .brand { font-size: 27px; font-weight: 800; letter-spacing: -0.02em; }
+  #side .brand em { font-style: normal; color: var(--accent); }
+  #side .brand-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  #side .side-foot {
+    display: block;
+    margin-top: auto;
+    padding: 14px 10px 0;
+    color: var(--muted);
+    border-top: 1px solid var(--hairline);
+  }
+  #main-nav {
+    flex-direction: column;
+    overflow: visible;
+    margin-top: 30px;
+    gap: 4px;
+  }
+  #main-nav button {
+    flex: none;
+    width: 100%;
+    min-height: 50px;
+    padding: 10px 16px;
+    font-size: 15px;
+    text-align: left;
+    border-radius: 14px;
+    color: var(--ink);
+  }
+  #main-nav button.active { background: var(--ink); color: #fff; }
+  #content { margin-left: 268px; }
+  main section { padding: 30px 34px 56px; max-width: 1140px; }
+  #view-newbill, #view-settings { max-width: 900px; } /* focused flows stay narrow */
+  footer { max-width: 1140px; margin: 0 auto; padding: 0 34px 36px; text-align: left; }
+}
+
+/* ---------- Views ---------- */
+main section { display: none; padding: 12px 16px 24px; max-width: 960px; margin: 0 auto; }
+main section.active { display: block; animation: rise 0.18s ease-out; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main section.active { animation: none; }
+}
+
+main h2 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 6px 0 12px;
+}
+
+footer { text-align: center; padding: 20px 16px 28px; color: var(--muted); font-size: 13px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(29, 28, 25, 0.04);
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--accent); box-shadow: none; }
+.btn:focus-visible, .input:focus-visible, #main-nav button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Primary actions go full-width on phones: easier thumbs, clearer flow */
+#bill-complete, #m-add, #c-add, #bd-apply { width: 100%; }
+@media (min-width: 760px) {
+  #bill-complete, #m-add, #c-add, #bd-apply { width: auto; }
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+/* app.js renders section titles as a leading <strong> — treat as title */
+.card > strong:first-child {
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.card small { color: var(--muted); }
+
+.grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+/* Dashboard stat numbers (rendered inline by app.js) */
+.card > div[style] { font-variant-numeric: tabular-nums; }
+
+/* ---------- Forms ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.input {
+  min-height: 48px;
+  padding: 12px 14px;
+  font-size: 16px; /* 16px stops iOS auto-zoom on focus */
+  font-family: inherit;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: #FCFBF9;
+  width: 100%;
+}
+.input:focus { border-color: var(--accent); background: #fff; outline: none; box-shadow: 0 0 0 3px var(--accent-tint); }
+select.input { appearance: none; }
+
+/* ---------- Tables ---------- */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow);
+}
+table.table { width: 100%; border-collapse: collapse; min-width: 560px; }
+table.table th, table.table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--hairline);
+  font-variant-numeric: tabular-nums;
+}
+table.table tr:last-child td { border-bottom: 0; }
+table.table th {
+  background: transparent;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* ---------- Totals: sticky on the bill view so the grand total is always visible ---------- */
+.totals {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 16px;
+  font-size: 15px;
+  box-shadow: var(--shadow);
+}
+.totals div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; font-variant-numeric: tabular-nums; }
+.totals .grand {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  border-top: 1px solid var(--hairline);
+  margin-top: 8px;
+  padding-top: 12px;
+}
+#view-newbill .totals {
+  position: sticky;
+  bottom: calc(var(--tabbar-h) + 12px);
+  z-index: 5;
+}
+@media (min-width: 760px) {
+  #view-newbill .totals { bottom: 12px; }
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.b-paid { background: var(--accent-tint); color: var(--accent); }
+.b-partial { background: var(--warn-tint); color: var(--warn); }
+.b-unpaid { background: var(--danger-tint); color: var(--danger); }
+.b-cancelled { background: #ECEAE4; color: var(--muted); }
+
+/* ---------- Toast / empty / error / rows ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + 16px);
+  transform: translateX(-50%) translateY(8px);
+  display: none;
+  padding: 13px 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 92vw;
+  z-index: 50;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+.toast.show { display: block; opacity: 1; transform: translateX(-50%); }
+.toast.ok { background: var(--accent); }
+.toast.err { background: var(--danger); }
+@media (min-width: 760px) { .toast { bottom: 24px; } }
+
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+.error {
+  padding: 12px 14px;
+  background: var(--danger-tint);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.row-flex { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Links */
+main a { color: var(--accent); font-weight: 600; }
+
+/* ---------- Screen-only helpers ---------- */
+.no-print { /* visible on screen; hidden in print via @media print */ }
+#print-area { display: none; } /* screen hides print area */
+
+/* ---------- Print rules (required contract — do not rename selectors) ---------- */
+@media print {
+  #main-nav, .no-print, main, footer, #toast { display: none !important; }
+  #print-area { display: block !important; }
+  body { background: #fff; padding: 0; }
+}
+
+/* Receipt widths set via body class by app.js before window.print() */
+body.print-58 #print-area { width: 58mm; font-size: 11px; }
+body.print-80 #print-area { width: 80mm; font-size: 12px; }
+body.print-a4 #print-area { width: 190mm; font-size: 13px; }
+
+/* Receipt content: compact, centered header, dashed separators */
+#print-area {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  color: #000;
+  margin: 0 auto;
+  line-height: 1.45;
+}
+#print-area .r-center { text-align: center; }
+#print-area .r-sep { border-top: 1px dashed #000; margin: 6px 0; }
+
+/* ---------- Premium mobile (APK) polish ---------- */
+html { background: var(--paper); } /* no white flash behind the app */
+body {
+  -webkit-tap-highlight-color: transparent; /* no grey tap boxes */
+  overscroll-behavior-y: none; /* app-like, no rubber-band page scroll */
+}
+/* Notch / edge-to-edge displays: sidebar already includes the top safe-area. */
+/* Crisper type on high-density phone screens */
+body { -webkit-font-smoothing: antialiased; }
+/* Bottom tab bar: subtle lift + springy active pill */
+#main-nav { box-shadow: 0 -8px 24px rgba(29, 28, 25, 0.08); }
+#main-nav button { transition: background 0.15s ease-out, color 0.15s ease-out, transform 0.1s ease-out; }
+#main-nav button:active { transform: scale(0.94); }
+/* Primary actions feel tactile */
+.btn-primary { box-shadow: 0 6px 16px rgba(12, 122, 61, 0.35); }
+.btn-primary:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(12, 122, 61, 0.3); }
+
+/* ---------- Laptop premium: roomier type, wide data views, hover craft ---------- */
+@media (min-width: 900px) {
+  body { font-size: 16.5px; }
+  main h2 { font-size: 28px; margin: 4px 0 18px; }
+  .card { padding: 22px; border-radius: 20px; }
+  table.table th, table.table td { padding: 13px 16px; }
+  /* Dashboard stats breathe in a 3-up row; the about-note spans below. */
+  #dashboard-app .grid { grid-template-columns: repeat(3, 1fr); }
+  #dashboard-app .grid .card:last-child { grid-column: 1 / -1; }
+  /* Totals read like a ledger slip on wide screens. */
+  .totals { padding: 20px 22px; }
+}
+@media (hover: hover) and (min-width: 900px) {
+  #main-nav button:hover { background: #F1EEE5; }
+  #main-nav button.active:hover { background: var(--ink); }
+  table.table tbody tr:hover { background: #FAF8F2; }
+  .btn:hover { filter: brightness(0.97); }
+  .btn-primary:hover { filter: none; background: #0A6B35; }
+}
+/* Invoice detail becomes a two-pane view on wide laptops. */
+@media (min-width: 1180px) {
+  #invoice-detail-app {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  #invoice-detail-app > p, #invoice-detail-app > h2 { grid-column: 1 / -1; }
+  #invoice-detail-app > div.card:nth-of-type(1) { grid-column: 1 / -1; }
+  #invoice-detail-app > div.card:nth-of-type(2) { grid-column: 1; grid-row: span 2; }
+}
+
+/* ============================================================
+   Design elevation appendix — premium calm, shop-green (CSS only).
+   Layers hierarchy and craft on top of the contract selectors
+   above. No gradients, no purple or blue, no glass effects.
+   ============================================================ */
+
+:root {
+  --hairline-strong: #D9D2C0;
+  --ink-soft: #3A382F;
+}
+
+::selection { background: var(--accent); color: #fff; }
+
+/* Focus rings for keyboard users on every control. Placed last so
+   keyboard focus keeps its ring while pointer focus stays quiet. */
+.btn:focus-visible,
+.input:focus-visible,
+#main-nav button:focus-visible,
+main a:focus-visible,
+.card a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Smoother view change; the reduced motion guard stays in force. */
+main section.active { animation: rise 0.26s cubic-bezier(0.22, 0.61, 0.21, 1); }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  main section.active { animation: none; }
+}
+
+/* Buttons: tactile press states for every variant. */
+.btn {
+  transition: background 0.15s ease-out, border-color 0.15s ease-out,
+    box-shadow 0.15s ease-out, filter 0.15s ease-out, transform 0.08s ease-out;
+}
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn-primary:active { background: #0A6B35; border-color: #0A6B35; box-shadow: 0 2px 8px rgba(12, 122, 61, 0.3); }
+.btn-danger:active { background: #A82424; border-color: #A82424; }
+.btn-ghost:active { background: var(--accent-tint); }
+
+/* Slim warm scrollbar on larger screens only. */
+@media (min-width: 900px) {
+  * { scrollbar-width: thin; scrollbar-color: #CFC7B2 transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: #CFC7B2;
+    border-radius: 999px;
+    border: 2px solid var(--paper);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #B4A98D; }
+  .table-wrap::-webkit-scrollbar-thumb { border-color: var(--surface); }
+}
+
+/* Sticky table headers on larger screens; solid sheet behind. */
+@media (min-width: 900px) {
+  .table-wrap { overflow: auto; }
+  table.table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    box-shadow: 0 1px 0 var(--hairline);
+  }
+}
+
+/* Dashboard: premium stat hierarchy. */
+#dashboard-app .grid .card { padding: 18px; }
+#dashboard-app .grid .card > div:first-child > strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0;
+}
+#dashboard-app .grid .card > div[style] {
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.15 !important;
+  margin: 6px 0 4px !important;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+#dashboard-app .grid .card:nth-child(-n+3) > div:last-child {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+#dashboard-app .grid .card:last-child { background: #FFFDF8; }
+#dashboard-app .grid .card:last-child > div:last-child {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+/* Recent invoices card: one sheet, flush table, no double frame. */
+#dashboard-app > .card { padding: 0; overflow: hidden; }
+#dashboard-app > .card > strong:first-child { padding: 18px 18px 0; margin-bottom: 12px; }
+#dashboard-app > .card .table-wrap {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  border-radius: 0;
+  box-shadow: none;
+}
+@media (min-width: 900px) {
+  #dashboard-app .grid .card { padding: 22px; }
+  #dashboard-app .grid .card > div[style] { font-size: 33px !important; }
+  #dashboard-app > .card > strong:first-child { padding: 22px 22px 0; }
+}
+
+/* Empty states: generous, dashed hairline frame, calm warm wash. */
+.empty {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  text-wrap: balance;
+  background: #FCFBF7;
+  border: 1.5px dashed var(--hairline-strong);
+  border-radius: var(--radius-sm);
+}
+@media (min-width: 900px) {
+  .empty { padding: 44px 28px; font-size: 15px; }
+}
+
+/* Invoice detail on screen: a paper document. */
+#invoice-detail-app { max-width: 860px; }
+#invoice-detail-app h2 {
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+#invoice-detail-app > p:first-child { margin: 4px 0 10px; }
+#invoice-detail-app > p:first-child a { text-decoration: none; font-size: 14px; }
+#invoice-detail-app > .card { padding: 20px; }
+#invoice-detail-app > div.card:nth-of-type(1) {
+  border-top: 4px solid var(--ink);
+  padding-top: 18px;
+}
+#invoice-detail-app > div.card:nth-of-type(1) > strong:first-child {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+#invoice-detail-app > div.card:nth-of-type(1) small { font-size: 13px; }
+#invoice-detail-app > div.card:nth-of-type(1) div {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+}
+#invoice-detail-app > div.card:nth-of-type(2) { padding: 0; overflow: hidden; }
+#invoice-detail-app > div.card:nth-of-type(2) .table-wrap {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+#invoice-detail-app > div.card:nth-of-type(2) table.table th { background: #FCFBF7; }
+#invoice-detail-app > div.card:nth-of-type(3) { padding: 0; overflow: hidden; }
+#invoice-detail-app > div.card:nth-of-type(3) .table-wrap {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+#invoice-detail-app table.table td:last-child,
+#invoice-detail-app table.table th:last-child { text-align: right; }
+#invoice-detail-app table.table strong { font-variant-numeric: tabular-nums; }
+@media (min-width: 900px) {
+  #invoice-detail-app > .card { padding: 24px; }
+  #invoice-detail-app > div.card:nth-of-type(2),
+  #invoice-detail-app > div.card:nth-of-type(3) { padding: 0; }
+}
+
+/* Small phone refinements: targets stay 44px and up, tab bar untouched. */
+@media (max-width: 759px) {
+  .row-flex { gap: 10px; }
+  table.table th, table.table td { padding: 11px 12px; font-size: 14.5px; }
+  #invoice-detail-app > .card { padding: 16px; }
+  #invoice-detail-app > div.card:nth-of-type(2),
+  #invoice-detail-app > div.card:nth-of-type(3) { padding: 0; }
+}
+
+/* Print: only ink saving, never touching the hide show contract. */
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
